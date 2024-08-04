@@ -2,6 +2,8 @@
 
 ChessSync is a real-time chess synchronization application that uses Redis for state management. It enables players to synchronize their chess games seamlessly across multiple devices and platforms. The application also integrates a chess engine for validating moves and providing game functionality.
 
+live website: https://chess-sync.vercel.app/
+
 ## Features
 
 - **Real-time Synchronization:** Sync game state in real-time across all connected devices.
