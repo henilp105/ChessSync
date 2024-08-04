@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game Interface</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+        .board-image {
+            max-width: 100%;
+            height: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .popup-content input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+        }
+        .popup-content button {
+            padding: 10px 20px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Chess Sync </h1>
+        <div class="text-center">
+            <img src="/board.svg?{{ time }}" class="board-image" alt="Game Board"/>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">{{error}}</h2>
+                <h3 class="text-center">Player Turn: {{turn}}</h3>
+                <form action="/reset/" method="post" class="form-group">
+                    <button name="New Game" type="submit" class="btn btn-primary btn-block">New Game</button>
+                </form>
+                <form action="/recieve/" method="post" class="form-group">
+                    <button name="recieve" type="submit" class="btn btn-secondary btn-block">Recieve other player move</button>
+                </form>
+                <form action="/move/" class="form-group">
+                    <div class="input-group">
+                        <input name="move" type="text" class="form-control" placeholder="Make Human Move:">
+                        <div class="input-group-append">
+                            <input type="submit" value="Submit" class="btn btn-info">
+                        </div>
+                    </div>
+                </form>
+                <form action="/algo/" method="post" class="form-group">
+                    <button name="Comp Move" type="submit" class="btn btn-warning btn-block">Make Algo Move</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <h2>Enter Game ID or Start New Game</h2>
+            <input type="text" id="gameIdInput" placeholder="Enter Game ID">
+            <br>
+            <button onclick="enterGame()">Enter Game</button>
+            <button onclick="startNewGame()">Start New Game</button>
+        </div>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const gameId = sessionStorage.getItem('gameId');
+        if (gameId) {
+            document.getElementById('popup').style.display = 'none';
+        }
+        function enterGame() {
+            const gameId = document.getElementById('gameIdInput').value;
+            if (gameId) {
+                sessionStorage.setItem('gameId', gameId);
+                alert('Entered Game ID: ' + gameId);
+                closePopup();
+            } else {
+                alert('Please enter a Game ID.');
+            }
+        }
+
+        async function startNewGame() {
+            try {
+                const response = await fetch('/generate');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    const newGameId = data.data;
+                    sessionStorage.setItem('gameId', newGameId);
+                    alert('New Game ID: ' + newGameId);
+                    closePopup();
+                } else {
+                    alert('Failed to generate new game ID.');
+                    console.log(response);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error generating new game ID.');
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function handleFormSubmission(event) {
+        var sessionVarValue = sessionStorage.getItem('gameId');
+        
+        // Set the value of the hidden input field
+        var hiddenInput = event.target.querySelector('.sessionVar');
+        hiddenInput.value = sessionVarValue;
+    }
+
+    // Get all forms and add the submit event listener
+    var forms = document.querySelectorAll('form');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', handleFormSubmission);
+    });
+    </script>
+</body>
+</html>

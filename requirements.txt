@@ -1,0 +1,4 @@
+flask
+chess
+redis
+python-dotenv
